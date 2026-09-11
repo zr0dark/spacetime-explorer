@@ -1,0 +1,14 @@
+{
+  "name": "spacetime-explorer",
+  "version": "0.1.0",
+  "description": "An offline educational gravity and clock visualization from RocketShift",
+  "license": "MIT",
+  "author": "Jason Armstrong",
+  "scripts": {
+    "test": "node verify.mjs",
+    "test:browser": "node browser-check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.61.0"
+  }
+}
