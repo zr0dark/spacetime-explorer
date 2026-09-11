@@ -27,3 +27,7 @@ const a=acceleration([3,0,0],4),a2=acceleration([3,0,0],8);assert.equal(a2[0],2*
 const hit={p:[1.01,0,0],v:[-2,0,0],status:'orbiting'};stepOrbit(hit,.02,4);assert.equal(hit.status,'impacted');
 const gone={p:[59.99,0,0],v:[10,0,0],status:'orbiting'};stepOrbit(gone,.02,4);assert.equal(gone.status,'escaped');
 console.log('Orbit core: fixed-mass energy/angular momentum, ellipse radial range, circular stability, escape energy, mass acceleration, collision and escape bounds passed.');
+
+const solar=initialBodies('solar',4);assert.equal(solar.length,8);assert.deepEqual(solar.map(b=>b.name),['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune']);
+for(const b of solar){for(let i=0;i<2400;i++)stepOrbit(b,1/240,4);assert.equal(b.status,'orbiting');assert.ok(b.p.every(Number.isFinite))}
+console.log('Eight-planet preset: names/order and finite stable integration passed.');
