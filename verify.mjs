@@ -12,3 +12,18 @@ for(const strength of [.3,1,1.3])for(const compactness of [.5,.00000424])for(con
 assert.ok(1-rate(1.45,.00000424)<.000002);
 assert.ok(!/<script[^>]+src=|<link[^>]+href=/i.test(html));
 console.log('Clock model: reference, zero mass, known value, radial ordering, domain, weak-field, offline assertions passed.');
+const core=html.slice(html.indexOf('function acceleration('),html.indexOf('let bodies='));
+const {stepOrbit,initialBodies,acceleration}=new Function(core+';return {stepOrbit,initialBodies,acceleration}')();
+const energy=(b,mu)=>b.v.reduce((s,v)=>s+v*v,0)/2-mu/Math.hypot(...b.p);
+const angular=b=>Math.hypot(b.p[1]*b.v[2]-b.p[2]*b.v[1],b.p[2]*b.v[0]-b.p[0]*b.v[2],b.p[0]*b.v[1]-b.p[1]*b.v[0]);
+for(const kind of ['circular','elliptical']){
+ const b=initialBodies(kind,4)[0],e=energy(b,4),h=angular(b);let min=Infinity,max=0;
+ for(let i=0;i<30000;i++){stepOrbit(b,1/240,4);const r=Math.hypot(...b.p);min=Math.min(min,r);max=Math.max(max,r)}
+ assert.equal(b.status,'orbiting');assert.ok(Math.abs((energy(b,4)-e)/e)<1e-4);assert.ok(Math.abs(angular(b)-h)<1e-10);
+ if(kind==='elliptical')assert.ok(max-min>1);else assert.ok(max-min<.001);
+}
+assert.ok(energy(initialBodies('escape',4)[0],4)>0);
+const a=acceleration([3,0,0],4),a2=acceleration([3,0,0],8);assert.equal(a2[0],2*a[0]);
+const hit={p:[1.01,0,0],v:[-2,0,0],status:'orbiting'};stepOrbit(hit,.02,4);assert.equal(hit.status,'impacted');
+const gone={p:[59.99,0,0],v:[10,0,0],status:'orbiting'};stepOrbit(gone,.02,4);assert.equal(gone.status,'escaped');
+console.log('Orbit core: fixed-mass energy/angular momentum, ellipse radial range, circular stability, escape energy, mass acceleration, collision and escape bounds passed.');
